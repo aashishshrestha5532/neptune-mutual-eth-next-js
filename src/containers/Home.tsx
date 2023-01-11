@@ -130,7 +130,7 @@ export default function Home() {
                 <span className="mt-10">
                   {!active && (
                     <button
-                      className="btn bg-primary border-none"
+                      className="btn bg-primary border-none text-white"
                       onClick={() => setWalletOpen(true)}
                     >
                       Connect to Wallet
