@@ -5,7 +5,7 @@ const ConnectionIconLabel = ({
   account,
 }: {
   status: boolean;
-  account?: string;
+  account?: string | null | undefined;
 }) => {
   return (
     <span className="flex flex-row items-center">
@@ -16,7 +16,7 @@ const ConnectionIconLabel = ({
       />
       <label className=" ml-2 text-muted">
         {status
-          ? `Connected with ${truncateString(account, 10)}`
+          ? `Connected with ${truncateString(account || "", 10)}`
           : "Disconnected"}
       </label>
     </span>
