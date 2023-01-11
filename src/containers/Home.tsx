@@ -6,22 +6,26 @@ import { useWeb3React } from "@web3-react/core";
 import { ArrowsRightLeftIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 import Modal from "../components/Modal";
+import TextInput from "../components/Input";
+import WalletDetails from "../components/WalletDetails";
+import ConnectionIconLabel from "../components/ConnectionIconLabel";
+
 import logo from "../../public/neptune-mutual.svg";
 import { CryptoCurrency } from "../enums/currency.enum";
-import WalletDetails from "../components/WalletDetails";
 import { IWalletDetails } from "../interfaces/wallet.inteface";
 import { injectedConnector } from "../utils/injector-connector";
-import ConnectionIconLabel from "../components/ConnectionIconLabel";
 import { truncateString, cryptoConversion } from "../utils/currency-converter";
 
 export default function Home() {
   const web3React = useWeb3React();
-  const [fromInput, setFromInput] = useState<string>();
-  const [toInput, setToInput] = useState<string>();
+  const [fromInput, setFromInput] = useState<string>("");
+  const [toInput, setToInput] = useState<string>("");
 
-  const [walletOpen, setWalletOpen] = useState<boolean>(false);
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [walletDetailsOpen, setWalletDetailsOpen] = useState<boolean>(false);
+  const [walletConnectionOpen, setWalletConnectionOpen] =
+    useState<boolean>(false);
+
   const [walletConnectionError, setWalletConnectionError] =
     useState<boolean>(false);
 
@@ -62,10 +66,11 @@ export default function Home() {
 
   const onConnectToWallet = async (): Promise<any> => {
     try {
-      setWalletOpen(false);
       await activate(injectedConnector);
     } catch (error) {
       setWalletConnectionError(true);
+    } finally {
+      setWalletConnectionOpen(false);
     }
   };
 
@@ -90,20 +95,14 @@ export default function Home() {
 
               <div className="flex flex-col w-full items-center justify-center py-5 px-10">
                 <span className="flex flex-row justify-center items-center w-full px-3">
-                  <div className="flex flex-row  items-center border-gray-300 w-full h-10 border bg-white rounded-sm">
-                    <span className="border border-gray-300 border-l-0 border-t-0 border-b-0 text-black px-5 bg-neptune h-full flex items-center justify-center">
-                      NEP
-                    </span>
-
-                    <input
-                      placeholder="0.00"
-                      type="number"
-                      value={fromInput}
-                      name={CryptoCurrency.NEP}
-                      onChange={handleInput}
-                      className="bg-transparent w-full h-full text-gray-500 pl-2 placeholder:text-gray-400"
-                    />
-                  </div>
+                  <TextInput
+                    label={CryptoCurrency.NEP}
+                    placeholder="0.00"
+                    type="number"
+                    value={fromInput}
+                    name={CryptoCurrency.NEP}
+                    onChange={handleInput}
+                  />
                 </span>
 
                 <span className="my-5">
@@ -111,27 +110,21 @@ export default function Home() {
                 </span>
 
                 <span className="flex flex-row justify-center items-center w-full px-3">
-                  <div className="flex flex-row  items-center border-gray-300 w-full h-10 border bg-white rounded-sm">
-                    <span className="border border-gray-300 border-l-0 border-t-0 border-b-0 text-black px-5 bg-neptune h-full flex items-center justify-center">
-                      BUSD
-                    </span>
-
-                    <input
-                      placeholder="0.00"
-                      type={"number"}
-                      name={CryptoCurrency.BUSD}
-                      value={toInput?.toString()}
-                      onChange={handleInput}
-                      className="bg-transparent w-full h-full text-gray-500 pl-2 placeholder:text-gray-400"
-                    />
-                  </div>
+                  <TextInput
+                    label={CryptoCurrency.BUSD}
+                    placeholder="0.00"
+                    type="number"
+                    value={toInput}
+                    name={CryptoCurrency.BUSD}
+                    onChange={handleInput}
+                  />
                 </span>
 
                 <span className="mt-10">
                   {!active && (
                     <button
                       className="btn bg-primary border-none text-white"
-                      onClick={() => setWalletOpen(true)}
+                      onClick={() => setWalletConnectionOpen(true)}
                     >
                       Connect to Wallet
                     </button>
@@ -160,19 +153,19 @@ export default function Home() {
 
       {/* Wallet connect modal */}
       <Modal
-        open={walletOpen}
-        setOpen={setWalletOpen}
+        open={walletConnectionOpen}
+        setOpen={setWalletConnectionOpen}
         hasButton={true}
         buttonType={active ? "normal" : "action"}
         onPositivePress={onConnectToWallet}
-        onNegativePress={() => setWalletOpen(false)}
+        onNegativePress={() => setWalletConnectionOpen(false)}
         positiveButtonTitle="Connect"
         negativeButtonTitle="Cancel"
       >
         <div>
           <span
             className="absolute right-5 top-5 cursor-pointer"
-            onClick={() => setWalletOpen(false)}
+            onClick={() => setWalletConnectionOpen(false)}
           >
             <XMarkIcon className="h-5 w-5 text-gray-600" />
           </span>
@@ -193,6 +186,7 @@ export default function Home() {
         </div>
       </Modal>
 
+      {/* Wallet details modal */}
       <Modal
         open={walletDetailsOpen}
         setOpen={setWalletDetailsOpen}
@@ -218,6 +212,7 @@ export default function Home() {
         </div>
       </Modal>
 
+      {/* Wallet connection error modal */}
       <Modal
         open={walletConnectionError}
         setOpen={setWalletConnectionError}
